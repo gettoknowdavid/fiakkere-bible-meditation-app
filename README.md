@@ -1,6 +1,5 @@
 # FiakKere - Offline-First Bible Meditation App
 
-[![Architecture: flutter_it](https://img.shields.io/badge/Architecture-flutter__it-FF6B6B?style=for-the-badge)](https://pub.dev/packages/flutter_it)
 [![State: watch_it](https://img.shields.io/badge/State-watch__it-purple?style=for-the-badge)](https://pub.dev/packages/watch_it)
 [![Logic: command_it](https://img.shields.io/badge/Logic-command__it-blueviolet?style=for-the-badge)](https://pub.dev/packages/command_it)
 [![Collections: listen_it](https://img.shields.io/badge/Collections-listen__it-darkgreen?style=for-the-badge)](https://pub.dev/packages/listen_it)
@@ -38,8 +37,10 @@ ancient metaphor of spiritual rumination into a modern digital experience.
 
 ## Architecture & Technical Stack
 
-FiakKere utilizes a highly scannable Pragmatic Flutter Architecture (PFA) powered by the flutter_it
-toolkit. This structure isolates responsibilities into clean, feature-driven boundaries:
+FiakKere utilizes a highly scannable
+*[Pragmatic Flutter Architecture (PFA)](https://blog.burkharts.net/practical-flutter-architecture)*
+powered by the `flutter_it` toolkit. This structure isolates responsibilities into clean,
+feature-driven boundaries:
 
 | Layer    | Responsibility                                                                       | Associated Dependencies                                   |
 |----------|--------------------------------------------------------------------------------------|-----------------------------------------------------------|
