@@ -178,7 +178,8 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(6, 465532983368182692),
         name: 'text',
         type: 9,
-        flags: 0,
+        flags: 2048,
+        indexId: const obx_int.IdUid(7, 5510217929477166689),
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(7, 5296374202771655773),
@@ -242,7 +243,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
     lastEntityId: const obx_int.IdUid(4, 2021634148547483745),
-    lastIndexId: const obx_int.IdUid(6, 469586121239963366),
+    lastIndexId: const obx_int.IdUid(7, 5510217929477166689),
     lastRelationId: const obx_int.IdUid(2, 6584114347613462968),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],

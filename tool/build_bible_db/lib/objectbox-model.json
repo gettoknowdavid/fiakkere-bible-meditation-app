@@ -76,7 +76,9 @@
         {
           "id": "6:7353765188104531838",
           "name": "text",
-          "type": 9
+          "indexId": "5:1916056066437042064",
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "7:2002649550900099643",
@@ -88,7 +90,7 @@
     }
   ],
   "lastEntityId": "2:580312705760554689",
-  "lastIndexId": "4:357794926886396049",
+  "lastIndexId": "5:1916056066437042064",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
