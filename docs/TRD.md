@@ -10,9 +10,12 @@
 
 ### 1.1 Mission
 
-Ship a fast, offline-first Flutter app that lets a user browse Bible verses, build a meditation playlist, set a timer,
-and start a looped audio+text session that keeps playing when the device is locked — with related-verse discovery woven
-into the experience. Launch speed is the primary constraint. Every architectural decision below is made in service of "
+Ship a fast, offline-first Flutter app that lets a user browse Bible verses, build a meditation
+playlist, set a timer,
+and start a looped audio+text session that keeps playing when the device is locked — with
+related-verse discovery woven
+into the experience. Launch speed is the primary constraint. Every architectural decision below is
+made in service of "
 fewest moving parts that still deliver a delightful core loop."
 
 ### 1.2 Non-Functional Requirements (ranked)
@@ -28,7 +31,8 @@ fewest moving parts that still deliver a delightful core loop."
 
 ### 1.3 Explicit Non-Goals (MVP)
 
-Multiple translations, cloud sync/accounts, social features, premium cloud TTS voices, background music/crossfading,
+Multiple translations, cloud sync/accounts, social features, premium cloud TTS voices, background
+music/crossfading,
 ML-based verse recommendations. All deferred to V2+ (see Section 7).
 
 ---
@@ -37,38 +41,55 @@ ML-based verse recommendations. All deferred to V2+ (see Section 7).
 
 ### 2.1 Copyright Strategy — Text Sourcing
 
-This is the highest-risk, non-technical part of the project and must be locked down before any UI work begins.
+This is the highest-risk, non-technical part of the project and must be locked down before any UI
+work begins.
 
-- **Translation**: Ship with **WEB (World English Bible)** as the default bundled translation. WEB is public domain
-  worldwide with no license restrictions, reads in modern English (better for a meditation/reading UX than KJV's archaic
+- **Translation**: Ship with **WEB (World English Bible)** as the default bundled translation. WEB
+  is public domain
+  worldwide with no license restrictions, reads in modern English (better for a meditation/reading
+  UX than KJV's archaic
   phrasing), and requires zero legal review.
-- **Fallback option**: KJV is also fully public domain and can be offered as a bundled alternative later, but WEB is the
+- **Fallback option**: KJV is also fully public domain and can be offered as a bundled alternative
+  later, but WEB is the
   MVP default.
-- **Explicitly avoid**: ESV, NIV, NLT, NASB, and other modern translations — these are copyrighted and require licensing
-  agreements (e.g., through Biblica/YouVersion) that are entirely out of scope for a fast MVP launch.
-- **Cross-reference data**: Use the **Treasury of Scripture Knowledge (TSK)** dataset for "related verses." TSK is
-  public domain, long-established, and available as flat verse-to-verse mapping data. This eliminates any need for an
+- **Explicitly avoid**: ESV, NIV, NLT, NASB, and other modern translations — these are copyrighted
+  and require licensing
+  agreements (e.g., through Biblica/YouVersion) that are entirely out of scope for a fast MVP
+  launch.
+- **Cross-reference data**: Use the **Treasury of Scripture Knowledge (TSK)** dataset for "related
+  verses." TSK is
+  public domain, long-established, and available as flat verse-to-verse mapping data. This
+  eliminates any need for an
   ML/embeddings-based recommendation system for MVP — it's a static lookup table.
-- **Action item before Phase 0 coding starts**: source a specific WEB text dataset and TSK cross-reference dataset from
-  a reputable open repository, and record the exact source + license confirmation in `/docs/data-sourcing.md`. Do not
+- **Action item before Phase 0 coding starts**: source a specific WEB text dataset and TSK
+  cross-reference dataset from
+  a reputable open repository, and record the exact source + license confirmation in
+  `/docs/data-sourcing.md`. Do not
   proceed to DB-building until this is confirmed in writing.
 
 ### 2.2 Audio Strategy — TTS Over Pre-Recorded
 
-- Pre-recording ~31,000 verses is a non-starter: multi-gigabyte asset size, massive time cost, and separate copyright
-  exposure even if the underlying text is PD (audio narrations are their own copyrighted work).
-- **MVP decision: on-device TTS via `flutter_tts`.** Zero hosting cost, zero bundle size impact, works fully offline,
+- Pre-recording ~31,000 verses is a non-starter: multi-gigabyte asset size, massive time cost, and
+  separate copyright
+  exposure even if the underlying text is PD (audio narrations are their own-copyrighted work).
+- **MVP decision: on-device TTS via `flutter_tts`.** Zero hosting cost, zero bundle size impact,
+  works fully offline,
   cross-platform (uses native iOS/Android TTS engines).
-- Audio is **generated on first play and cached to local file storage**, keyed by verse ID + voice/locale settings, so a
+- Audio is **generated on first play and cached to local file storage**, keyed by verse ID +
+  voice/locale settings, so a
   verse is only synthesized once per device.
-- The `AudioPlayerService` is built behind a clean interface from day one specifically so a future premium cloud-TTS
-  provider (ElevenLabs, Google Cloud TTS) can be swapped in post-launch without touching call sites — this is a
+- The `AudioPlayerService` is built behind a clean interface from day one specifically so a future
+  premium cloud-TTS
+  provider (ElevenLabs, Google Cloud TTS) can be swapped in post-launch without touching call
+  sites — this is a
   deliberate seam, not speculative abstraction.
 
 ### 2.3 What This Strategy Buys Us
 
-By combining a PD translation + static TSK cross-references + on-device TTS, the entire MVP requires **zero backend
-infrastructure, zero recurring costs, and zero licensing risk.** This is what makes "shortest path to launch" actually
+By combining a PD translation + static TSK cross-references + on-device TTS, the entire MVP requires
+**zero backend
+infrastructure, zero recurring costs, and zero licensing risk.** This is what makes "shortest path
+to launch" actually
 achievable for a solo dev.
 
 ---
@@ -77,15 +98,21 @@ achievable for a solo dev.
 
 ### 3.1 Architectural Style
 
-**Pragmatic Flutter Architecture (PFA)** using the `flutter_it` construction set. Three layers per feature:
+**Pragmatic Flutter Architecture (PFA)** using the `flutter_it` construction set. Three layers per
+feature:
 
-- **Services** — wrap exactly one external boundary (ObjectBox, `flutter_tts`, `just_audio`/`audio_service`,
-  `shared_preferences`). Stateless from the app's perspective; convert between external and internal data shapes. Never
+- **Services** — wrap exactly one external boundary (ObjectBox, `flutter_tts`, `just_audio`/
+  `audio_service`,
+  `shared_preferences`). Stateless from the app's perspective; convert between external and internal
+  data shapes. Never
   hold app state.
-- **Managers** — own business logic and app state for a feature area (`ScriptureManager`, `PlaylistManager`,
-  `SessionManager`, `SettingsManager`). Expose `ValueListenable`s and `Command`s. Never touched directly by widgets for
+- **Managers** — own business logic and app state for a feature area (`ScriptureManager`,
+  `PlaylistManager`,
+  `SessionManager`, `SettingsManager`). Expose `ValueListenable`s and `Command`s. Never touched
+  directly by widgets for
   mutation — only through Commands.
-- **Views** — pages and widgets. Self-responsible: know what data they need, `watch()` it directly from Managers via
+- **Views** — pages and widgets. Self-responsible: know what data they need, `watch()` it directly
+  from Managers via
   `get_it`. Never call Services directly.
 
 ### 3.2 `flutter_it` Package Roles
@@ -99,22 +126,32 @@ achievable for a solo dev.
 
 ### 3.3 Core Reactive Data Flow (the "session loop")
 
-1. `PlaylistManager` holds the user's saved verse selection (ObjectBox-backed, reactive via `Stream` query wrapped in a
+1. `PlaylistManager` holds the user's saved verse selection (ObjectBox-backed, reactive via `Stream`
+   query wrapped in a
    `ValueNotifier`).
-2. On "Start Session," `SessionManager.startCommand` copies the playlist into `activeQueue` (`ListNotifier<Verse>`).
-3. `AudioPlayerService` subscribes to `activeQueue` via `listen_it`'s `listen()` and mirrors additions/removals into
-   `just_audio`'s `ConcatenatingAudioSource`, generating/fetching cached TTS audio per verse as needed.
-4. If "Dynamic Play" is enabled (`SettingsManager`), on each verse completion `RelatedVerseInjector` queries TSK
-   cross-references via `ScriptureManager`/ObjectBox and inserts a related verse into `activeQueue` — no manual wiring
+2. On "Start Session," `SessionManager.startCommand` copies the playlist into `activeQueue` (
+   `ListNotifier<Verse>`).
+3. `AudioPlayerService` subscribes to `activeQueue` via `listen_it`'s `listen()` and mirrors
+   additions/removals into
+   `just_audio`'s `ConcatenatingAudioSource`, generating/fetching cached TTS audio per verse as
+   needed.
+4. If "Dynamic Play" is enabled (`SettingsManager`), on each verse completion `RelatedVerseInjector`
+   queries TSK
+   cross-references via `ScriptureManager`/ObjectBox and inserts a related verse into
+   `activeQueue` — no manual wiring
    needed elsewhere, because everything downstream already reacts to the queue.
-5. `SessionTimerDisplay` and `RelatedVersePanel` are separate small `WatchingWidget`s so a once-per-second timer tick
+5. `SessionTimerDisplay` and `RelatedVersePanel` are separate small `WatchingWidget`s so a
+   once-per-second timer tick
    doesn't rebuild the whole player page.
 
 ### 3.4 Why Not Riverpod for MVP
 
-See Section 7. Short version: `flutter_it` has less ceremony, no required codegen outside ObjectBox, and a gentler
-solo-dev learning curve — the right trade for launch speed. The folder structure is intentionally close enough to a
-Clean Architecture layering that a future migration is a targeted rewrite of the Manager/Command layer, not a full app
+See Section 7. Short version: `flutter_it` has less ceremony, no required codegen outside ObjectBox,
+and a gentler
+solo-dev learning curve — the right trade for launch speed. The folder structure is intentionally
+close enough to a
+Clean Architecture layering that a future migration is a targeted rewrite of the Manager/Command
+layer, not a full app
 rewrite.
 
 ---
@@ -134,8 +171,10 @@ rewrite.
 | `shared_preferences`                   | Simple key-value settings (dynamic-play toggle, default timer length, TTS voice/rate) | No need for ObjectBox here — settings aren't queried/related data |
 | `path_provider`                        | Locate app document directory for cached TTS audio files                              | Standard utility, no architectural weight                         |
 
-**Explicitly not included in MVP:** `dio`/`http` (no network calls in core loop), `riverpod`, `drift`/`sqflite` (
-superseded by ObjectBox per updated requirements), `workmanager`/`android_alarm_manager` (audio_service's foreground
+**Explicitly not included in MVP:** `dio`/`http` (no network calls in core loop), `riverpod`,
+`drift`/`sqflite` (
+superseded by ObjectBox per updated requirements), `workmanager`/`android_alarm_manager` (
+audio_service's foreground
 service is sufficient to keep the process alive during an active session).
 
 ---
@@ -144,14 +183,22 @@ service is sufficient to keep the process alive during an active session).
 
 ### 5.1 Design Principles
 
-- Two logical groups of data: **read-only bundled Scripture data** (Verses, CrossReferences) and **user-generated data
-  ** (Playlists, PlaylistItems). They can live in the same ObjectBox store — ObjectBox doesn't require separate files
-  per "table" the way a bundled-vs-writable SQLite split might — but the import script must treat them differently (
-  Scripture data is pre-seeded and never mutated by the user; playlist data is created/mutated entirely on-device).
-- Use ObjectBox **relations** (`ToOne`/`ToMany`) for CrossReferences and PlaylistItems rather than manually managed
-  foreign-key integers — this is exactly the use case ObjectBox relations are good at, and keeps query code simple.
-- Use ObjectBox's native `Stream` query watching (`box.query(...).watch(triggerImmediately: true)`) to drive reactive
-  `ValueNotifier`s in Managers — this replaces the "reactive SQL" role that `drift` would have played, with no codegen
+- Two logical groups of data: **read-only bundled Scripture data** (Verses, CrossReferences) and **
+  user-generated data
+  ** (Playlists, PlaylistItems). They can live in the same ObjectBox store — ObjectBox doesn't
+  require separate files
+  per "table" the way a bundled-vs-writable SQLite split might — but the import script must treat
+  them differently (
+  Scripture data is pre-seeded and never mutated by the user; playlist data is created/mutated
+  entirely on-device).
+- Use ObjectBox **relations** (`ToOne`/`ToMany`) for CrossReferences and PlaylistItems rather than
+  manually managed
+  foreign-key integers — this is exactly the use case ObjectBox relations are good at, and keeps
+  query code simple.
+- Use ObjectBox's native `Stream` query watching (`box.query(...).watch(triggerImmediately: true)`)
+  to drive reactive
+  `ValueNotifier`s in Managers — this replaces the "reactive SQL" role that `drift` would have
+  played, with no codegen
   beyond the standard ObjectBox model binding.
 
 ### 5.2 Entities
@@ -213,38 +260,56 @@ class PlaylistItem {
 
 **Notes:**
 
-- `CrossReference` is intentionally a first-class entity (not just an embedded list) so TSK data can be bulk-imported as
+- `CrossReference` is intentionally a first-class entity (not just an embedded list) so TSK data can
+  be bulk-imported as
   flat rows during the DB-build step, matching the source dataset's shape.
-- `PlaylistItem.sortOrder` is explicit rather than relying on `ToMany` list order, because ObjectBox `ToMany` order is
-  not guaranteed to be stable/query-independent — never rely on implicit relation ordering for anything user-facing.
-- No `AudioCache` entity — cached TTS audio files are tracked on the filesystem (`path_provider` app documents dir,
-  filename = verse ID + voice hash), not in ObjectBox. This keeps the DB purely about Scripture/user data, not binary
+- `PlaylistItem.sortOrder` is explicit rather than relying on `ToMany` list order, because ObjectBox
+  `ToMany` order is
+  not guaranteed to be stable/query-independent — never rely on implicit relation ordering for
+  anything user-facing.
+- No `AudioCache` entity — cached TTS audio files are tracked on the filesystem (`path_provider` app
+  documents dir,
+  filename = verse ID + voice hash), not in ObjectBox. This keeps the DB purely about Scripture/user
+  data, not binary
   blobs.
 
 ### 5.3 Bundling a Pre-Built ObjectBox Database
 
-ObjectBox does **not** support directly shipping a pre-populated store file as a Flutter asset in the same trivial way
-SQLite does (asset copy + open) — the store's internal file layout is tied to `Store.directory` and platform specifics.
+ObjectBox does **not** support directly shipping a pre-populated store file as a Flutter asset in
+the same trivial way
+SQLite does (asset copy + open) — the store's internal file layout is tied to `Store.directory` and
+platform specifics.
 The correct MVP approach:
 
-1. **Build-time step (dev machine, run once):** Write a standalone Dart script (`tool/build_bible_db.dart`) that opens a
-   fresh ObjectBox `Store`, imports the WEB verse dataset and TSK cross-reference dataset, and writes the resulting
+1. **Build-time step (dev machine, run once):** Write a standalone Dart script (
+   `tool/build_bible_db.dart`) that opens a
+   fresh ObjectBox `Store`, imports the WEB verse dataset and TSK cross-reference dataset, and
+   writes the resulting
    `objectbox` data directory to disk.
-2. **Package the resulting data directory** (`objectbox/data.mdb` and friends) as a **zipped Flutter asset** (
+2. **Package the resulting data directory** (`objectbox/data.mdb` and friends) as a **zipped Flutter
+   asset** (
    `assets/bible_db.zip`) bundled with the app.
-3. **On first app launch**, `DatabaseService.init()` checks whether the app's ObjectBox store directory already exists
-   in the app's documents/support directory. If not, it unzips `assets/bible_db.zip` into that directory before opening
-   the `Store`. All subsequent launches open the existing store directly — this unzip-on-first-run only happens once per
+3. **On first app launch**, `DatabaseService.init()` checks whether the app's ObjectBox store
+   directory already exists
+   in the app's documents/support directory. If not, it unzips `assets/bible_db.zip` into that
+   directory before opening
+   the `Store`. All subsequent launches open the existing store directly — this unzip-on-first-run
+   only happens once per
    install.
-4. User-generated data (Playlists, PlaylistItems) live in the **same store**, added after the bundled Scripture data —
-   this is safe because ObjectBox IDs are stable and the import script controls ID assignment for bundled entities
-   deterministically (or simply lets ObjectBox auto-assign, since Playlists reference Verses via `ToOne` relations, not
-   hardcoded IDs).
-5. This "unzip pre-built store on first run" pattern trades a small first-launch delay (roughly the unzip time,
-   negligible for the target DB size) for avoiding a slow verse-by-verse runtime import — the trade is clearly correct
+4. User-generated data (Playlists, PlaylistItems) live in the **same store**, added after the
+   bundled Scripture data —
+   this is safe because ObjectBox IDs are stable and the import script controls ID assignment for
+   bundled entities
+   deterministically (or simply lets ObjectBox auto-assign, since Playlists reference Verses via
+   `ToOne` relations, not hardcoded IDs).
+5. This "unzip pre-built store on first run" pattern trades a small first-launch delay (roughly the
+   unzip time,
+   negligible for the target DB size) for avoiding a slow verse-by-verse runtime import — the trade
+   is clearly correct
    for a Bible-sized dataset.
 
-**Action item**: prototype this unzip-on-first-launch flow **early** (Phase 0) — it's the one piece of ObjectBox usage
+**Action item**: prototype this unzip-on-first-launch flow **early** (Phase 0) — it's the one piece
+of ObjectBox usage
 in this project that's non-standard, and it should not be discovered as a blocker mid-MVP.
 
 ---
@@ -330,7 +395,8 @@ docs/
 
 - Organize by feature, not by layer.
 - Promote something to `_shared/` only once a second feature needs it.
-- No interface classes/abstract Services unless a second implementation is already planned (the one deliberate
+- No interface classes/abstract Services unless a second implementation is already planned (the one
+  deliberate
   exception: `AudioPlayerService`'s TTS engine seam, per Section 2.2).
 - Managers are registered as lazy singletons in `locator.dart`; Views never construct them.
 
@@ -338,20 +404,28 @@ docs/
 
 ## 7. Scalability Note — Path to V2 (Riverpod + Clean Architecture)
 
-`flutter_it`/PFA is the right choice for MVP: minimal boilerplate, no required codegen outside ObjectBox, fast for a
-solo dev to hold in their head. It is **not** the recommendation for a team-scale, long-lived codebase, and that
+`flutter_it`/PFA is the right choice for MVP: minimal boilerplate, no required codegen outside
+ObjectBox, fast for a
+solo dev to hold in their head. It is **not** the recommendation for a team-scale, long-lived
+codebase, and that
 trade-off should be made consciously, not accidentally.
 
-**If/when this app scales past solo-MVP** (collaborators join, state graph grows past what Managers comfortably express,
-testing rigor increases), the recommended migration target is **Riverpod + a light Clean Architecture layering**:
+**If/when this app scales past solo-MVP** (collaborators join, state graph grows past what Managers
+comfortably express,
+testing rigor increases), the recommended migration target is **Riverpod + a light Clean
+Architecture layering**:
 
-- `get_it`'s `di<T>()` resolves at runtime — a missing registration is a runtime crash, not a compile error. Riverpod
+- `get_it`'s `di<T>()` resolves at runtime — a missing registration is a runtime crash, not a
+  compile error. Riverpod
   providers are statically analyzable.
-- Riverpod's `ProviderScope` overrides are more ergonomic for test isolation than get_it scope push/pop, and don't risk
+- Riverpod's `ProviderScope` overrides are more ergonomic for test isolation than get_it scope
+  push/pop, and don't risk
   state leaking between tests if teardown is forgotten.
-- `autoDispose` providers matter for a media app with lots of per-session transient state (audio queues, TTS cache
+- `autoDispose` providers matter for a media app with lots of per-session transient state (audio
+  queues, TTS cache
   lookups) that shouldn't leak across many session start/stop cycles.
-- Riverpod pairs cleanly with ObjectBox's `Stream` queries via `StreamProvider`, giving a more uniform state-dependency
+- Riverpod pairs cleanly with ObjectBox's `Stream` queries via `StreamProvider`, giving a more
+  uniform state-dependency
   model as the app grows more moving parts.
 
 **Target V2 layering:**
@@ -364,8 +438,10 @@ lib/
   presentation/   # ConsumerWidgets — replace today's WatchingWidgets
 ```
 
-This is intentionally close enough to the current feature-based structure that migration is a targeted swap of the
-Manager/Command layer for Notifiers/Providers within the same feature folders — **not** a full rewrite. **Do not**
+This is intentionally close enough to the current feature-based structure that migration is a
+targeted swap of the
+Manager/Command layer for Notifiers/Providers within the same feature folders — **not** a full
+rewrite. **Do not**
 front-load this ceremony into the MVP; it is a deliberate, later decision.
 
 ---

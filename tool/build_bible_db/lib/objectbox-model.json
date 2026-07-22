@@ -1,0 +1,101 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3191769014581596681",
+      "lastPropertyId": "4:1476907495242914587",
+      "name": "CrossReference",
+      "properties": [
+        {
+          "id": "1:458385319270705752",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8475042921773591458",
+          "name": "sourceVerseId",
+          "indexId": "1:1112436064440317633",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Verse"
+        },
+        {
+          "id": "3:2351733655352294483",
+          "name": "relatedVerseId",
+          "indexId": "2:1860157126774660615",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Verse"
+        },
+        {
+          "id": "4:1476907495242914587",
+          "name": "weight",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:580312705760554689",
+      "lastPropertyId": "7:2002649550900099643",
+      "name": "Verse",
+      "properties": [
+        {
+          "id": "1:4186533040986951770",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4130720537340740571",
+          "name": "reference",
+          "indexId": "3:7868431798941484870",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:107204383206556302",
+          "name": "book",
+          "indexId": "4:357794926886396049",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "4:1312273018070645975",
+          "name": "chapter",
+          "type": 6
+        },
+        {
+          "id": "5:8725863063810354179",
+          "name": "verse",
+          "type": 6
+        },
+        {
+          "id": "6:7353765188104531838",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "7:2002649550900099643",
+          "name": "translation",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:580312705760554689",
+  "lastIndexId": "4:357794926886396049",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

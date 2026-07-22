@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Build artifacts (regenerate via tool/build_bible_db/build_bible_db.dart)
+assets/bible_db.zip
+tool/build_bible_db/download/
+tool/build_bible_db/build_output/
