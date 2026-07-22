@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 import 'package:fiakkere/_shared/models/objectbox.g.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
-class Database {
+class Database implements Disposable {
   Database._(this._store);
 
   late final Store _store;
@@ -63,7 +65,8 @@ class Database {
     await tempDir.rename(finalStoreDirectory.path);
   }
 
-  Future<void> dispose() async {
+  @override
+  FutureOr<dynamic> onDispose() {
     _store.close();
   }
 }
