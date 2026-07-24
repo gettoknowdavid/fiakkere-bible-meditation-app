@@ -40,6 +40,7 @@ dependencies:
   archive: ^4.0.9
   flutter_it: ^2.1.2
   path: ^1.9.1
+  kaisel: ^1.0.0
 
 dev_dependencies:
   flutter_test:
