@@ -1,6 +1,8 @@
 import 'package:fiakkere/_shared/routing/playlist_route.dart';
 import 'package:fiakkere/_shared/routing/scripture_route.dart';
 import 'package:fiakkere/_shared/routing/settings_route.dart';
+import 'package:fiakkere/features/scripture/pages/verse_browser_page.dart';
+import 'package:fiakkere/features/scripture/pages/verse_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:kaisel/kaisel.dart';
 
@@ -14,9 +16,8 @@ class AppShell extends StatelessWidget {
         KaiselBranchSpec<ScriptureRoute>(
           initial: const VerseBrowser(),
           builder: (context, route) => switch (route) {
-            VerseBrowser() => const Placeholder(),
-            VerseSearch() => const Placeholder(),
-            VerseDetail(:final verseId) => Placeholder(),
+            VerseBrowser() => const VerseBrowserPage(),
+            VerseSearch() => const VerseSearchPage(),
           },
         ),
         KaiselBranchSpec<PlaylistRoute>(
