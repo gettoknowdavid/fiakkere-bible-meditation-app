@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:fiakkere/_shared/models/bible_metadata.dart';
 import 'package:fiakkere/_shared/models/cross_reference.dart';
@@ -21,13 +22,12 @@ class ScriptureManager implements Disposable {
           : translation.value;
 
       final query = (_verseBox.query(
-        Verse_.book.equals(book.value) &
-            Verse_.chapter.equals(chapter.value) &
-            Verse_.translation.equals(trans),
+        Verse_.book.equals(1) & Verse_.chapter.equals(1),
       )..order(Verse_.verse)).build();
 
       try {
         final result = query.find();
+        log('Result of the verses query => $result');
         verses.startTransAction();
         verses.addAll(result);
         verses.endTransAction();
@@ -35,6 +35,22 @@ class ScriptureManager implements Disposable {
         query.close();
       }
     });
+    getVerseCommand = Command.createSync((verseId) {
+      verse.value = verseId;
+
+      final query = (_verseBox.query(
+        Verse_.book.equals(book.value) &
+            Verse_.chapter.equals(chapter.value) &
+            Verse_.translation.equals(translation.value),
+      )..order(Verse_.verse)).build();
+
+      try {
+        final result = query.find();
+        return result[0];
+      } finally {
+        query.close();
+      }
+    }, initialValue: null);
     getCrossReferenceCommand = Command.createSyncNoResult((verse) {
       final query = (_crossRefBox.query(
         CrossReference_.sourceVerse.equals(verse),
@@ -60,6 +76,7 @@ class ScriptureManager implements Disposable {
   late final Command<String, String> searchQueryCommand;
   late final Command<String, List<Verse>> searchCommand;
   late final Command<ScriptureArgs, void> getVersesCommand;
+  late final Command<int, Verse?> getVerseCommand;
   late final Command<int, void> getCrossReferenceCommand;
 
   final book = ValueNotifier<int>(0);
@@ -81,6 +98,9 @@ class ScriptureManager implements Disposable {
   List<String> get bookNames => BibleMetadata.bookNames;
 
   String bookName(int id) => BibleMetadata.bookName(id);
+
+  /// Get the current book name
+  String get currentBookName => BibleMetadata.bookName(book.value);
 
   /// Chapter count for the currently active book.
   int get chapterCount => BibleMetadata.chapterCount(book.value);

@@ -11,3 +11,10 @@ final class VerseBrowser extends ScriptureRoute {
 final class VerseSearch extends ScriptureRoute {
   const VerseSearch();
 }
+
+final class VerseList extends ScriptureRoute {
+  const VerseList({required this.book, required this.chapter});
+
+  final int book;
+  final int chapter;
+}

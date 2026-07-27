@@ -18,6 +18,10 @@ class AppShell extends StatelessWidget {
           builder: (context, route) => switch (route) {
             VerseBrowser() => const VerseBrowserPage(),
             VerseSearch() => const VerseSearchPage(),
+            VerseList(:final book, :final chapter) => VerseListPage(
+              book: book,
+              chapter: chapter,
+            ),
           },
         ),
         KaiselBranchSpec<PlaylistRoute>(
