@@ -1,0 +1,75 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:archive/archive.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_it/flutter_it.dart';
+import 'package:models/models.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+
+class DatabaseService implements Disposable {
+  DatabaseService._(this._store);
+
+  late final Store _store;
+  Store get store => _store;
+
+  static const _markerFilename = '.unzip_complete';
+  static const _finalDirName = 'objectbox';
+  static const _tempDirName = 'objectbox_temp_unzip';
+
+  static Future<DatabaseService> create() async {
+    final supportDir = await getApplicationSupportDirectory();
+    final finalStoreDir = Directory(path.join(supportDir.path, _finalDirName));
+    final markerFIle = File(path.join(finalStoreDir.path, _markerFilename));
+
+    if (!await markerFIle.exists()) {
+      await _unzipBundledStore(supportDir, finalStoreDir);
+    }
+
+    final store = openStore(directory: finalStoreDir.path);
+    return DatabaseService._(store);
+  }
+
+  static Future<void> _unzipBundledStore(
+    Directory supportDirectory,
+    Directory finalStoreDirectory,
+  ) async {
+    final tempDir = Directory(path.join(supportDirectory.path, _tempDirName));
+
+    if (await tempDir.exists()) await tempDir.delete(recursive: true);
+    await tempDir.create(recursive: true);
+
+    final bytesData = await rootBundle.load('assets/bible_db.zip');
+    final bytes = bytesData.buffer.asUint8List();
+    log('Loaded bible_db.zip: ${bytes.length} bytes');
+
+    final archive = ZipDecoder().decodeBytes(bytes);
+    log('Archive entries: ${archive.length}');
+    for (final file in archive) {
+      log('  ${file.name} (isFile: ${file.isFile}, size: ${file.size})');
+      final outPath = path.join(tempDir.path, file.name);
+      if (file.isFile) {
+        final outFile = File(outPath);
+        await outFile.create(recursive: true);
+        await outFile.writeAsBytes(file.content as List<int>);
+      } else {
+        await Directory(outPath).create(recursive: true);
+      }
+    }
+
+    await File(path.join(tempDir.path, _markerFilename)).create();
+
+    if (await finalStoreDirectory.exists()) {
+      await finalStoreDirectory.delete(recursive: true);
+    }
+
+    await tempDir.rename(finalStoreDirectory.path);
+  }
+
+  @override
+  FutureOr<dynamic> onDispose() {
+    _store.close();
+  }
+}

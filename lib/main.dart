@@ -1,6 +1,9 @@
+import 'package:fiakkere/locator.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  configureDependencies();
   runApp(const MainApp());
 }
 
@@ -10,11 +13,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+      home: Scaffold(body: Center(child: Text('Hello World!'))),
     );
   }
 }

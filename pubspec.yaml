@@ -7,8 +7,17 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
+  archive: ^4.0.9
   flutter:
     sdk: flutter
+  flutter_it: ^2.1.2
+  kaisel: ^1.0.0
+  models:
+    path: ./packages/models
+  objectbox: ^5.3.2
+  objectbox_flutter_libs: any
+  path: ^1.9.1
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +26,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/bible_db.zip
