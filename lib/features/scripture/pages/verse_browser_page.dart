@@ -1,4 +1,4 @@
-import 'package:fiakkere/_shared/models/verse.dart';
+import 'package:bible_models/bible_models.dart';
 import 'package:fiakkere/_shared/routing/scripture_route.dart';
 import 'package:fiakkere/features/scripture/manager/scripture_manager.dart';
 import 'package:fiakkere/features/scripture/widgets/verse_tile.dart';
@@ -32,7 +32,6 @@ class _BookList extends WatchingWidget {
   @override
   Widget build(BuildContext context) {
     final manager = di<ScriptureManager>();
-    final book = watchValue<ScriptureManager, int>((m) => m.book);
     final books = manager.bookNames;
     return ListView.separated(
       itemCount: books.length,
@@ -41,9 +40,7 @@ class _BookList extends WatchingWidget {
         return ListTile(
           title: Text(bookName),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => _ChapterListPage(book: book)),
-          ),
+          onTap: () => context.push(ChapterList(index + 1)),
         );
       },
       separatorBuilder: (context, index) => const SizedBox(height: 10),
@@ -51,19 +48,18 @@ class _BookList extends WatchingWidget {
   }
 }
 
-class _ChapterListPage extends WatchingWidget {
-  const _ChapterListPage({required this.book});
+class ChapterListPage extends WatchingWidget {
+  const ChapterListPage({required this.book, super.key});
 
   final int book;
 
   @override
   Widget build(BuildContext context) {
     final manager = di<ScriptureManager>();
+    callOnce((context) => manager.setBook(book));
 
-    final book = watchValue<ScriptureManager, int>((m) => m.book);
     final currentChapter = watchValue<ScriptureManager, int>((m) => m.chapter);
-
-    final chapters = manager.chapterCount;
+    final chapters = manager.chapterCount(book);
 
     return Scaffold(
       appBar: AppBar(title: Text('Book ${manager.currentBookName}')),

@@ -28,19 +28,17 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  archive: ^4.0.9
+  bible_models:
+    path: ./packages/bible_models
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  objectbox: ^5.3.2
-  objectbox_flutter_libs: ^5.3.2
-  path_provider: ^2.1.6
-  archive: ^4.0.9
   flutter_it: ^2.1.2
-  path: ^1.9.1
   kaisel: ^1.0.0
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  sqflite: ^2.4.3
 
 dev_dependencies:
   flutter_test:
@@ -52,9 +50,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  build_runner: ^2.15.1
-  objectbox_generator: ^5.3.2
-  xml: ^7.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -69,7 +64,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/bible_db.zip
+    - assets/bible_db.sqlite
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

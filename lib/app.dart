@@ -11,7 +11,7 @@ final _routerConfig = KaiselRouterConfig<AppRoute>(
     OnboardingRoute() => const Placeholder(),
     LoginRoute() => const Placeholder(),
     ShellHost() => const AppShell(),
-    SessionPlayer(:final playlistId) => Placeholder(),
+    SessionPlayer() => Placeholder(),
   },
   pageWrapper: _rootPageWrapper,
 );

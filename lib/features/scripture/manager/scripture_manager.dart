@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:bible_models/bible_models.dart';
 import 'package:fiakkere/_shared/models/bible_metadata.dart';
-import 'package:fiakkere/_shared/models/cross_reference.dart';
-import 'package:fiakkere/_shared/models/objectbox.g.dart';
-import 'package:fiakkere/_shared/models/verse.dart';
 import 'package:fiakkere/_shared/services/database_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_it/flutter_it.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ScriptureManager implements Disposable {
-  ScriptureManager(this._database) {
+  ScriptureManager(this._databaseService) {
     searchQueryCommand = Command.createSync((query) => query, initialValue: '');
     searchCommand = Command.createAsync(_runSearch, initialValue: const []);
-    getVersesCommand = Command.createSyncNoResult((args) {
+    getVersesCommand = Command.createAsyncNoResult((args) async {
       book.value = args.book;
       chapter.value = args.chapter;
       verse.value = args.verse;
@@ -21,48 +20,82 @@ class ScriptureManager implements Disposable {
           ? args.translation
           : translation.value;
 
-      final query = (_verseBox.query(
-        Verse_.book.equals(1) & Verse_.chapter.equals(1),
-      )..order(Verse_.verse)).build();
+      final resultMaps = await _db.query(
+        'verses',
+        where: 'translation = ? AND book = ? AND chapter = ?',
+        whereArgs: [trans, book.value, chapter.value],
+        orderBy: 'verse ASC',
+      );
 
-      try {
-        final result = query.find();
-        log('Result of the verses query => $result');
-        verses.startTransAction();
-        verses.addAll(result);
-        verses.endTransAction();
-      } finally {
-        query.close();
-      }
+      final result = resultMaps.map((m) => Verse.fromMap(m)).toList();
+      log('Result of the verses query => ${result.length} verses loaded');
+
+      verses.startTransAction();
+      verses.clear();
+      verses.addAll(result);
+      verses.endTransAction();
     });
-    getVerseCommand = Command.createSync((verseId) {
-      verse.value = verseId;
+    getVerseCommand = Command.createAsync((verseId) async {
+      final resultMaps = await _db.query(
+        'verses',
+        where: 'id = ? AND translation = ?',
+        whereArgs: [verseId, translation.value],
+        orderBy: 'verse ASC',
+        limit: 1,
+      );
 
-      final query = (_verseBox.query(
-        Verse_.book.equals(book.value) &
-            Verse_.chapter.equals(chapter.value) &
-            Verse_.translation.equals(translation.value),
-      )..order(Verse_.verse)).build();
-
-      try {
-        final result = query.find();
-        return result[0];
-      } finally {
-        query.close();
-      }
+      if (resultMaps.isNotEmpty) return Verse.fromMap(resultMaps.first);
+      return null;
     }, initialValue: null);
-    getCrossReferenceCommand = Command.createSyncNoResult((verse) {
-      final query = (_crossRefBox.query(
-        CrossReference_.sourceVerse.equals(verse),
-      )..order(CrossReference_.weight, flags: Order.descending)).build();
-      try {
-        final result = query.find();
-        crossReferences.startTransAction();
-        crossReferences.addAll(result);
-        crossReferences.endTransAction();
-      } finally {
-        query.close();
-      }
+    getCrossReferenceCommand = Command.createAsyncNoResult((verseId) async {
+      final results = await _db.rawQuery(
+        '''
+        SELECT 
+          cr.id AS cr_id,
+          cr.sourceVerseId,
+          cr.relatedVerseId,
+          cr.weight,
+          v.id AS v_id,
+          v.reference,
+          v.universalKey,
+          v.book,
+          v.chapter,
+          v.verse,
+          v.text,
+          v.translation
+        FROM cross_references cr
+        INNER JOIN verses v ON cr.relatedVerseId = v.id
+        WHERE cr.sourceVerseId = ?
+        ORDER BY cr.weight DESC
+      ''',
+        [verseId],
+      );
+
+      final list = results.map((row) {
+        final relatedVerse = Verse(
+          id: row['v_id'] as int,
+          reference: row['reference'] as String,
+          universalKey: row['universalKey'] as String,
+          book: row['book'] as int,
+          chapter: row['chapter'] as int,
+          verse: row['verse'] as int,
+          text: row['text'] as String,
+          translation: row['translation'] as String,
+        );
+
+        return CrossReference(
+          id: row['cr_id'] as int,
+          sourceVerseId: row['sourceVerseId'] as int,
+          relatedVerseId: row['relatedVerseId'] as int,
+          weight: row['weight'] as int,
+          relatedVerse: relatedVerse,
+        );
+      }).toList();
+
+      crossReferences.startTransAction();
+      crossReferences.clear();
+      crossReferences.addAll(list);
+      crossReferences.endTransAction();
     });
 
     _searchQuerySubscription = searchQueryCommand
@@ -71,7 +104,9 @@ class ScriptureManager implements Disposable {
         .pipeToCommand(searchCommand);
   }
 
-  final Database _database;
+  final DatabaseService _databaseService;
+
+  Database get _db => _databaseService.db;
 
   late final Command<String, String> searchQueryCommand;
   late final Command<String, List<Verse>> searchCommand;
@@ -89,13 +124,11 @@ class ScriptureManager implements Disposable {
 
   late final ListenableSubscription _searchQuerySubscription;
 
-  Box<Verse> get _verseBox => _database.store.box<Verse>();
-
-  Box<CrossReference> get _crossRefBox => _database.store.box<CrossReference>();
-
   List<int> get books => BibleMetadata.books.keys.toList();
 
   List<String> get bookNames => BibleMetadata.bookNames;
+
+  void setBook(int value) => book.value = value;
 
   String bookName(int id) => BibleMetadata.bookName(id);
 
@@ -103,7 +136,7 @@ class ScriptureManager implements Disposable {
   String get currentBookName => BibleMetadata.bookName(book.value);
 
   /// Chapter count for the currently active book.
-  int get chapterCount => BibleMetadata.chapterCount(book.value);
+  int chapterCount(int book) => BibleMetadata.chapterCount(book);
 
   /// Verse count for the currently active chapter.
   int get verseCount => BibleMetadata.verseCount(book.value, chapter.value);
@@ -112,15 +145,15 @@ class ScriptureManager implements Disposable {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return const [];
 
-    final q = (_verseBox.query(
-      Verse_.text.contains(trimmed, caseSensitive: false),
-    )).order(Verse_.book).build();
+    // Using SQL LIKE for text matching
+    final resultMaps = await _db.query(
+      'verses',
+      where: 'text LIKE ?',
+      whereArgs: ['%$trimmed%'],
+      orderBy: 'book ASC, chapter ASC, verse ASC',
+    );
 
-    try {
-      return q.find();
-    } finally {
-      q.close();
-    }
+    return resultMaps.map((m) => Verse.fromMap(m)).toList();
   }
 
   @override

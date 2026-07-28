@@ -5,10 +5,10 @@ import 'package:flutter_it/flutter_it.dart';
 
 void configureDependencies() {
   di.registerSingleton<InteractionManager>(InteractionManager());
-  di.registerSingletonAsync<Database>(Database.create);
+  di.registerSingletonAsync<DatabaseService>(DatabaseService.create);
 
   di.registerSingletonWithDependencies<ScriptureManager>(
-    () => ScriptureManager(di<Database>()),
-    dependsOn: [Database],
+    () => ScriptureManager(di<DatabaseService>()),
+    dependsOn: [DatabaseService],
   );
 }

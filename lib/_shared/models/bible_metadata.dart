@@ -1,5 +1,3 @@
-import 'package:fiakkere/_shared/models/verse.dart';
-
 /// Pure compile-time data. No imports, no async, no instances.
 ///
 /// Keyed by integer book index (0 = Genesis … 65 = Revelation),
@@ -16,7 +14,7 @@ abstract final class BibleMetadata {
   static int bookId(String name) => bookIndex[name] ?? -1;
 
   /// Number of chapters in a book.
-  static int chapterCount(int bookId) => chapterCounts[bookId] ?? 0;
+  static int chapterCount(int bookId) => chapterCounts[bookId] ?? 1;
 
   /// Number of verses in a specific chapter (1-based chapter number).
   /// Returns 0 if book or chapter is out of range.
@@ -33,72 +31,72 @@ abstract final class BibleMetadata {
   ///
   /// This is the standard and is the same for most Bible Translations
   static const Map<int, String> books = {
-    0: 'Genesis',
-    1: 'Exodus',
-    2: 'Leviticus',
-    3: 'Numbers',
-    4: 'Deuteronomy',
-    5: 'Joshua',
-    6: 'Judges',
-    7: 'Ruth',
-    8: '1 Samuel',
-    9: '2 Samuel',
-    10: '1 Kings',
-    11: '2 Kings',
-    12: '1 Chronicles',
-    13: '2 Chronicles',
-    14: 'Ezra',
-    15: 'Nehemiah',
-    16: 'Esther',
-    17: 'Job',
-    18: 'Psalms',
-    19: 'Proverbs',
-    20: 'Ecclesiastes',
-    21: 'Song of Solomon',
-    22: 'Isaiah',
-    23: 'Jeremiah',
-    24: 'Lamentations',
-    25: 'Ezekiel',
-    26: 'Daniel',
-    27: 'Hosea',
-    28: 'Joel',
-    29: 'Amos',
-    30: 'Obadiah',
-    31: 'Jonah',
-    32: 'Micah',
-    33: 'Nahum',
-    34: 'Habakkuk',
-    35: 'Zephaniah',
-    36: 'Haggai',
-    37: 'Zechariah',
-    38: 'Malachi',
-    39: 'Matthew',
-    40: 'Mark',
-    41: 'Luke',
-    42: 'John',
-    43: 'Acts of the Apostles',
-    44: 'Romans',
-    45: '1 Corinthians',
-    46: '2 Corinthians',
-    47: 'Galatians',
-    48: 'Ephesians',
-    49: 'Philippians',
-    50: 'Colossians',
-    51: '1 Thessalonians',
-    52: '2 Thessalonians',
-    53: '1 Timothy',
-    54: '2 Timothy',
-    55: 'Titus',
-    56: 'Philemon',
-    57: 'Hebrews',
-    58: 'James',
-    59: '1 Peter',
-    60: '2 Peter',
-    61: '1 John',
-    62: '2 John',
-    63: '3 John',
-    64: 'Jude',
-    65: 'Revelation',
+    1: 'Genesis',
+    2: 'Exodus',
+    3: 'Leviticus',
+    4: 'Numbers',
+    5: 'Deuteronomy',
+    6: 'Joshua',
+    7: 'Judges',
+    8: 'Ruth',
+    9: '1 Samuel',
+    10: '2 Samuel',
+    11: '1 Kings',
+    12: '2 Kings',
+    13: '1 Chronicles',
+    14: '2 Chronicles',
+    15: 'Ezra',
+    16: 'Nehemiah',
+    17: 'Esther',
+    18: 'Job',
+    19: 'Psalms',
+    20: 'Proverbs',
+    21: 'Ecclesiastes',
+    22: 'Song of Solomon',
+    23: 'Isaiah',
+    24: 'Jeremiah',
+    25: 'Lamentations',
+    26: 'Ezekiel',
+    27: 'Daniel',
+    28: 'Hosea',
+    29: 'Joel',
+    30: 'Amos',
+    31: 'Obadiah',
+    32: 'Jonah',
+    33: 'Micah',
+    34: 'Nahum',
+    35: 'Habakkuk',
+    36: 'Zephaniah',
+    37: 'Haggai',
+    38: 'Zechariah',
+    39: 'Malachi',
+    40: 'Matthew',
+    41: 'Mark',
+    42: 'Luke',
+    43: 'John',
+    44: 'Acts of the Apostles',
+    45: 'Romans',
+    46: '1 Corinthians',
+    47: '2 Corinthians',
+    48: 'Galatians',
+    49: 'Ephesians',
+    50: 'Philippians',
+    51: 'Colossians',
+    52: '1 Thessalonians',
+    53: '2 Thessalonians',
+    54: '1 Timothy',
+    55: '2 Timothy',
+    56: 'Titus',
+    57: 'Philemon',
+    58: 'Hebrews',
+    59: 'James',
+    60: '1 Peter',
+    61: '2 Peter',
+    62: '1 John',
+    63: '2 John',
+    64: '3 John',
+    65: 'Jude',
+    66: 'Revelation',
   };
 
   /// Inverse map — name → book index. Built once at startup.
@@ -109,72 +107,72 @@ abstract final class BibleMetadata {
 
   /// Chapter counts per book (66 books)
   static const Map<int, int> chapterCounts = {
-    0: 50,
-    1: 40,
-    2: 27,
-    3: 36,
-    4: 34,
-    5: 24,
-    6: 21,
-    7: 4,
-    8: 31,
-    9: 24,
-    10: 22,
-    11: 25,
-    12: 29,
-    13: 36,
-    14: 10,
-    15: 13,
-    16: 10,
-    17: 42,
-    18: 150,
-    19: 31,
-    20: 12,
-    21: 8,
-    22: 66,
-    23: 52,
-    24: 5,
-    25: 48,
-    26: 12,
-    27: 14,
-    28: 3,
-    29: 9,
-    30: 1,
-    31: 4,
-    32: 7,
-    33: 3,
+    1: 50,
+    2: 40,
+    3: 27,
+    4: 36,
+    5: 34,
+    6: 24,
+    7: 21,
+    8: 4,
+    9: 31,
+    10: 24,
+    11: 22,
+    12: 25,
+    13: 29,
+    14: 36,
+    15: 10,
+    16: 13,
+    17: 10,
+    18: 42,
+    19: 150,
+    20: 31,
+    21: 12,
+    22: 8,
+    23: 66,
+    24: 52,
+    25: 5,
+    26: 48,
+    27: 12,
+    28: 14,
+    29: 3,
+    30: 9,
+    31: 1,
+    32: 4,
+    33: 7,
     34: 3,
     35: 3,
-    36: 2,
-    37: 14,
-    38: 4,
-    39: 28,
-    40: 16,
-    41: 24,
-    42: 21,
-    43: 28,
-    44: 16,
+    36: 3,
+    37: 2,
+    38: 14,
+    39: 4,
+    40: 28,
+    41: 16,
+    42: 24,
+    43: 21,
+    44: 28,
     45: 16,
-    46: 13,
-    47: 6,
+    46: 16,
+    47: 13,
     48: 6,
-    49: 4,
+    49: 6,
     50: 4,
-    51: 5,
-    52: 3,
-    53: 6,
-    54: 4,
-    55: 3,
-    56: 1,
-    57: 13,
-    58: 5,
+    51: 4,
+    52: 5,
+    53: 3,
+    54: 6,
+    55: 4,
+    56: 3,
+    57: 1,
+    58: 13,
     59: 5,
-    60: 3,
-    61: 5,
-    62: 1,
+    60: 5,
+    61: 3,
+    62: 5,
     63: 1,
     64: 1,
-    65: 22,
+    65: 1,
+    66: 22,
   };
 
   /// Map of Book ID to a List where each entry is the verse count for
@@ -182,7 +180,7 @@ abstract final class BibleMetadata {
   ///
   /// Index 0 of the list corresponds to Chapter 1.
   static const Map<int, List<int>> verseCounts = {
-    0: [
+    1: [
       31,
       25,
       24,
@@ -235,7 +233,7 @@ abstract final class BibleMetadata {
       26,
     ],
     // Genesis
-    1: [
+    2: [
       22,
       25,
       22,
@@ -278,7 +276,7 @@ abstract final class BibleMetadata {
       38,
     ],
     // Exodus
-    2: [
+    3: [
       17,
       16,
       17,
@@ -308,7 +306,7 @@ abstract final class BibleMetadata {
       34,
     ],
     // Leviticus
-    3: [
+    4: [
       54,
       34,
       51,
@@ -347,7 +345,7 @@ abstract final class BibleMetadata {
       13,
     ],
     // Numbers
-    4: [
+    5: [
       46,
       37,
       29,
@@ -384,7 +382,7 @@ abstract final class BibleMetadata {
       12,
     ],
     // Deuteronomy
-    5: [
+    6: [
       18,
       24,
       17,
@@ -411,7 +409,7 @@ abstract final class BibleMetadata {
       33,
     ],
     // Joshua
-    6: [
+    7: [
       36,
       23,
       31,
@@ -435,9 +433,9 @@ abstract final class BibleMetadata {
       25,
     ],
     // Judges
-    7: [22, 23, 18, 22],
+    8: [22, 23, 18, 22],
     // Ruth
-    8: [
+    9: [
       28,
       36,
       21,
@@ -471,7 +469,7 @@ abstract final class BibleMetadata {
       13,
     ],
     // 1 Samuel
-    9: [
+    10: [
       27,
       32,
       39,
@@ -498,7 +496,7 @@ abstract final class BibleMetadata {
       25,
     ],
     // 2 Samuel
-    10: [
+    11: [
       53,
       46,
       28,
@@ -523,7 +521,7 @@ abstract final class BibleMetadata {
       53,
     ],
     // 1 Kings
-    11: [
+    12: [
       18,
       25,
       27,
@@ -551,7 +549,7 @@ abstract final class BibleMetadata {
       30,
     ],
     // 2 Kings
-    12: [
+    13: [
       54,
       41,
       24,
@@ -583,7 +581,7 @@ abstract final class BibleMetadata {
       30,
     ],
     // 1 Chronicles
-    13: [
+    14: [
       17,
       18,
       17,
@@ -622,13 +620,13 @@ abstract final class BibleMetadata {
       23,
     ],
     // 2 Chronicles
-    14: [11, 70, 13, 24, 17, 22, 28, 36, 15, 44],
+    15: [11, 70, 13, 24, 17, 22, 28, 36, 15, 44],
     // Ezra
-    15: [11, 20, 32, 23, 19, 19, 73, 18, 38, 39, 36, 47, 31],
+    16: [11, 20, 32, 23, 19, 19, 73, 18, 38, 39, 36, 47, 31],
     // Nehemiah
-    16: [22, 23, 15, 17, 14, 14, 10, 17, 32, 3],
+    17: [22, 23, 15, 17, 14, 14, 10, 17, 32, 3],
     // Esther
-    17: [
+    18: [
       22,
       13,
       26,
@@ -673,7 +671,7 @@ abstract final class BibleMetadata {
       17,
     ],
     // Job
-    18: [
+    19: [
       6,
       12,
       8,
@@ -826,7 +824,7 @@ abstract final class BibleMetadata {
       6,
     ],
     // Psalms
-    19: [
+    20: [
       33,
       22,
       35,
@@ -860,11 +858,11 @@ abstract final class BibleMetadata {
       31,
     ],
     // Proverbs
-    20: [18, 26, 22, 16, 20, 12, 29, 17, 18, 20, 10, 14],
+    21: [18, 26, 22, 16, 20, 12, 29, 17, 18, 20, 10, 14],
     // Ecclesiastes
-    21: [17, 17, 11, 16, 16, 13, 13, 14],
+    22: [17, 17, 11, 16, 16, 13, 13, 14],
     // Song of Solomon
-    22: [
+    23: [
       31,
       22,
       26,
@@ -933,7 +931,7 @@ abstract final class BibleMetadata {
       24,
     ],
     // Isaiah
-    23: [
+    24: [
       19,
       37,
       25,
@@ -988,9 +986,9 @@ abstract final class BibleMetadata {
       34,
     ],
     // Jeremiah
-    24: [22, 22, 66, 22, 22],
+    25: [22, 22, 66, 22, 22],
     // Lamentations
-    25: [
+    26: [
       28,
       10,
       27,
@@ -1041,33 +1039,33 @@ abstract final class BibleMetadata {
       35,
     ],
     // Ezekiel
-    26: [21, 49, 30, 37, 31, 28, 28, 27, 27, 21, 45, 13],
+    27: [21, 49, 30, 37, 31, 28, 28, 27, 27, 21, 45, 13],
     // Daniel
-    27: [11, 23, 5, 19, 15, 11, 16, 14, 17, 15, 12, 14, 16, 9],
+    28: [11, 23, 5, 19, 15, 11, 16, 14, 17, 15, 12, 14, 16, 9],
     // Hosea
-    28: [20, 32, 21],
+    29: [20, 32, 21],
     // Joel
-    29: [15, 16, 15, 13, 27, 14, 17, 14, 15],
+    30: [15, 16, 15, 13, 27, 14, 17, 14, 15],
     // Amos
-    30: [21],
+    31: [21],
     // Obadiah
-    31: [17, 10, 10, 11],
+    32: [17, 10, 10, 11],
     // Jonah
-    32: [16, 13, 12, 13, 15, 16, 20],
+    33: [16, 13, 12, 13, 15, 16, 20],
     // Micah
-    33: [15, 13, 19],
+    34: [15, 13, 19],
     // Nahum
-    34: [17, 20, 19],
+    35: [17, 20, 19],
     // Habakkuk
-    35: [18, 15, 20],
+    36: [18, 15, 20],
     // Zephaniah
-    36: [15, 23],
+    37: [15, 23],
     // Haggai
-    37: [21, 13, 10, 14, 11, 15, 14, 23, 17, 12, 17, 14, 9, 21],
+    38: [21, 13, 10, 14, 11, 15, 14, 23, 17, 12, 17, 14, 9, 21],
     // Zechariah
-    38: [14, 17, 18, 6],
+    39: [14, 17, 18, 6],
     // Malachi
-    39: [
+    40: [
       25,
       23,
       17,
@@ -1098,9 +1096,9 @@ abstract final class BibleMetadata {
       20,
     ],
     // Matthew
-    40: [45, 28, 35, 41, 43, 56, 37, 38, 50, 52, 33, 44, 37, 72, 47, 20],
+    41: [45, 28, 35, 41, 43, 56, 37, 38, 50, 52, 33, 44, 37, 72, 47, 20],
     // Mark
-    41: [
+    42: [
       80,
       52,
       38,
@@ -1127,7 +1125,7 @@ abstract final class BibleMetadata {
       53,
     ],
     // Luke
-    42: [
+    43: [
       51,
       25,
       36,
@@ -1151,7 +1149,7 @@ abstract final class BibleMetadata {
       25,
     ],
     // John
-    43: [
+    44: [
       26,
       47,
       26,
@@ -1182,49 +1180,49 @@ abstract final class BibleMetadata {
       31,
     ],
     // Acts
-    44: [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27],
+    45: [32, 29, 31, 25, 21, 23, 25, 39, 33, 21, 36, 21, 14, 23, 33, 27],
     // Romans
-    45: [31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24],
+    46: [31, 16, 23, 21, 13, 20, 40, 13, 27, 33, 34, 31, 13, 40, 58, 24],
     // 1 Corinthians
-    46: [24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14],
+    47: [24, 17, 18, 18, 21, 18, 16, 24, 15, 18, 33, 21, 14],
     // 2 Corinthians
-    47: [24, 21, 29, 31, 26, 18],
+    48: [24, 21, 29, 31, 26, 18],
     // Galatians
-    48: [23, 22, 21, 32, 33, 24],
+    49: [23, 22, 21, 32, 33, 24],
     // Ephesians
-    49: [30, 30, 21, 23],
+    50: [30, 30, 21, 23],
     // Philippians
-    50: [29, 23, 25, 18],
+    51: [29, 23, 25, 18],
     // Colossians
-    51: [10, 20, 13, 18, 28],
+    52: [10, 20, 13, 18, 28],
     // 1 Thessalonians
-    52: [12, 17, 18],
+    53: [12, 17, 18],
     // 2 Thessalonians
-    53: [20, 15, 16, 16, 25, 21],
+    54: [20, 15, 16, 16, 25, 21],
     // 1 Timothy
-    54: [18, 26, 17, 22],
+    55: [18, 26, 17, 22],
     // 2 Timothy
-    55: [16, 15, 15],
+    56: [16, 15, 15],
     // Titus
-    56: [25],
+    57: [25],
     // Philemon
-    57: [14, 18, 19, 16, 14, 20, 28, 13, 28, 39, 40, 29, 25],
+    58: [14, 18, 19, 16, 14, 20, 28, 13, 28, 39, 40, 29, 25],
     // Hebrews
-    58: [27, 26, 18, 17, 20],
+    59: [27, 26, 18, 17, 20],
     // James
-    59: [25, 25, 22, 19, 14],
+    60: [25, 25, 22, 19, 14],
     // 1 Peter
-    60: [21, 22, 18],
+    61: [21, 22, 18],
     // 2 Peter
-    61: [10, 29, 24, 21, 21],
+    62: [10, 29, 24, 21, 21],
     // 1 John
-    62: [13],
+    63: [13],
     // 2 John
-    63: [14],
+    64: [14],
     // 3 John
-    64: [25],
+    65: [25],
     // Jude
-    65: [
+    66: [
       20,
       29,
       22,

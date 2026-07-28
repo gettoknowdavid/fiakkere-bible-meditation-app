@@ -16,6 +16,7 @@ class AppShell extends StatelessWidget {
         KaiselBranchSpec<ScriptureRoute>(
           initial: const VerseBrowser(),
           builder: (context, route) => switch (route) {
+            ChapterList(:final book) => ChapterListPage(book: book),
             VerseBrowser() => const VerseBrowserPage(),
             VerseSearch() => const VerseSearchPage(),
             VerseList(:final book, :final chapter) => VerseListPage(
@@ -28,7 +29,7 @@ class AppShell extends StatelessWidget {
           initial: const PlaylistList(),
           builder: (context, route) => switch (route) {
             PlaylistList() => const Placeholder(),
-            PlaylistDetail(:final playlistId) => const Placeholder(),
+            PlaylistDetail() => const Placeholder(),
           },
         ),
         KaiselBranchSpec<SettingsRoute>(

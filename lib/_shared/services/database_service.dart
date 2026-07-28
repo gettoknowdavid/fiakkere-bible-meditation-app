@@ -1,72 +1,57 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
-import 'package:fiakkere/_shared/models/objectbox.g.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_it/flutter_it.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:sqflite/sqflite.dart' as sqflite;
 
-class Database implements Disposable {
-  Database._(this._store);
+class DatabaseService implements Disposable {
+  // Private constructor ensures the class can only be instantiated
+  // via the async create() factory method.
+  DatabaseService._(this._db);
 
-  late final Store _store;
+  final sqflite.Database _db;
 
-  Store get store => _store;
+  /// Expose the underlying sqflite database instance for queries
+  sqflite.Database get db => _db;
 
-  static const _markerFilename = '.unzip_complete';
-  static const _finalDirName = 'objectbox';
-  static const _tempDirName = 'objectbox_temp_unzip';
+  static const _dbName = 'bible_db.sqlite';
 
-  static Future<Database> create() async {
-    final supportDir = await getApplicationSupportDirectory();
-    final finalStoreDir = Directory(path.join(supportDir.path, _finalDirName));
-    final markerFIle = File(path.join(finalStoreDir.path, _markerFilename));
+  /// Asynchronously initializes and returns a fully prepared DatabaseService.
+  static Future<DatabaseService> create() async {
+    final dbDirPath = await sqflite.getDatabasesPath();
+    final dbPath = path.join(dbDirPath, _dbName);
 
-    if (!await markerFIle.exists()) {
-      await _unzipBundledStore(supportDir, finalStoreDir);
+    // Check if the database has already been copied to the device's native storage
+    final exists = await sqflite.databaseExists(dbPath);
+
+    if (!exists) {
+      // Ensure the parent directory exists before attempting to write
+      try {
+        await Directory(path.dirname(dbPath)).create(recursive: true);
+      } catch (_) {}
+
+      // Load the pre-seeded SQLite file bundled in the Flutter assets
+      final ByteData data = await rootBundle.load('assets/$_dbName');
+      final List<int> bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
+
+      // Write the bytes to the device's native database directory
+      await File(dbPath).writeAsBytes(bytes, flush: true);
     }
 
-    final store = await openStore(directory: finalStoreDir.path);
-    return Database._(store);
-  }
+    // Open the connection to the local database file
+    final database = await sqflite.openDatabase(dbPath);
 
-  static Future<void> _unzipBundledStore(
-    Directory supportDirectory,
-    Directory finalStoreDirectory,
-  ) async {
-    final tempDir = Directory(path.join(supportDirectory.path, _tempDirName));
-
-    if (await tempDir.exists()) await tempDir.delete(recursive: true);
-    await tempDir.create(recursive: true);
-
-    final bytesData = await rootBundle.load('assets/bible_db.zip');
-    final bytes = bytesData.buffer.asUint8List();
-
-    final archive = ZipDecoder().decodeBytes(bytes);
-    for (final file in archive) {
-      final outPath = path.join(tempDir.path, file.name);
-      if (file.isFile) {
-        final outFile = File(outPath);
-        await outFile.create(recursive: true);
-        await outFile.writeAsBytes(file.content as List<int>);
-      } else {
-        await Directory(outPath).create(recursive: true);
-      }
-    }
-
-    await File(path.join(tempDir.path, _markerFilename)).create();
-
-    if (await finalStoreDirectory.exists()) {
-      await finalStoreDirectory.delete(recursive: true);
-    }
-
-    await tempDir.rename(finalStoreDirectory.path);
+    return DatabaseService._(database);
   }
 
   @override
   FutureOr<dynamic> onDispose() {
-    _store.close();
+    // Safely close the database connection when the service is disposed
+    _db.close();
   }
 }

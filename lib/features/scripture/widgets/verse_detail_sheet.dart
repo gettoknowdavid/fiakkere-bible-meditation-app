@@ -1,5 +1,4 @@
-import 'package:fiakkere/_shared/models/cross_reference.dart';
-import 'package:fiakkere/_shared/models/verse.dart';
+import 'package:bible_models/bible_models.dart';
 import 'package:fiakkere/features/scripture/manager/scripture_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
@@ -13,24 +12,18 @@ class VerseDetailSheet extends WatchingWidget {
   Widget build(BuildContext context) {
     final manager = di<ScriptureManager>();
 
-    Verse? verse;
-
     callOnce((context) => manager.getVerseCommand.run(verseId));
+
+    final verse = watchValue((ScriptureManager m) => m.getVerseCommand.results);
 
     registerHandler(
       select: (ScriptureManager m) => m.getVerseCommand,
       handler: (context, result, cancel) {
         if (result != null) {
           manager.getCrossReferenceCommand.run(verseId);
-          verse = result;
         }
       },
     );
-
-    if (verse == null) {
-      // Defensive: verse could theoretically be missing if id is stale.
-      return const SizedBox.shrink();
-    }
 
     final crossRefs = watchValue<ScriptureManager, List<CrossReference>>(
       (m) => m.crossReferences,
@@ -41,16 +34,27 @@ class VerseDetailSheet extends WatchingWidget {
       maxChildSize: 0.9,
       expand: false,
       builder: (context, scrollController) {
+        if (verse.isRunning) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!verse.hasData || verse.data == null) {
+          return Text('Nothing to show here');
+        }
+
         return ListView(
           controller: scrollController,
           padding: const EdgeInsets.all(20),
           children: [
             Text(
-              verse!.reference,
+              verse.data!.reference,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text(verse!.text, style: Theme.of(context).textTheme.bodyLarge),
+            Text(
+              verse.data!.text,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
             const SizedBox(height: 12),
             FilledButton.tonalIcon(
               onPressed: () {
@@ -67,7 +71,7 @@ class VerseDetailSheet extends WatchingWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              for (final ref in crossRefs) _RelatedVerseRow(crossRef: ref),
+              for (final ref in crossRefs) _RelatedVerseRow(ref: ref),
             ],
           ],
         );
@@ -77,15 +81,13 @@ class VerseDetailSheet extends WatchingWidget {
 }
 
 class _RelatedVerseRow extends WatchingWidget {
-  const _RelatedVerseRow({required this.crossRef});
+  const _RelatedVerseRow({required this.ref});
 
-  final dynamic crossRef; // CrossReference — typed via manager import above
+  final CrossReference? ref;
 
   @override
   Widget build(BuildContext context) {
-    final related = crossRef
-        .relatedVerse
-        .target; // ToOne<Verse>.target resolves eagerly via ObjectBox
+    final related = ref?.relatedVerse;
     if (related == null) return const SizedBox.shrink();
 
     return ListTile(
@@ -95,10 +97,6 @@ class _RelatedVerseRow extends WatchingWidget {
         related.text,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-      ),
-      trailing: Text(
-        'w:${crossRef.weight}',
-        style: Theme.of(context).textTheme.labelSmall,
       ),
       onTap: () {
         Navigator.of(context).pop();
