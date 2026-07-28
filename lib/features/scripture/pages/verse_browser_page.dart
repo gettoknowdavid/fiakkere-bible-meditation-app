@@ -32,7 +32,6 @@ class _BookList extends WatchingWidget {
   @override
   Widget build(BuildContext context) {
     final manager = di<ScriptureManager>();
-    final book = watchValue<ScriptureManager, int>((m) => m.book);
     final books = manager.bookNames;
     return ListView.separated(
       itemCount: books.length,
@@ -41,9 +40,7 @@ class _BookList extends WatchingWidget {
         return ListTile(
           title: Text(bookName),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => _ChapterListPage(book: book)),
-          ),
+          onTap: () => context.push(ChapterList(book: index + 1)),
         );
       },
       separatorBuilder: (context, index) => const SizedBox(height: 10),
@@ -51,24 +48,20 @@ class _BookList extends WatchingWidget {
   }
 }
 
-class _ChapterListPage extends WatchingWidget {
-  const _ChapterListPage({required this.book});
+class ChapterListPage extends WatchingWidget {
+  const ChapterListPage({super.key, required this.book});
 
   final int book;
 
   @override
   Widget build(BuildContext context) {
-    final manager = di<ScriptureManager>();
-
-    final book = watchValue<ScriptureManager, int>((m) => m.book);
-    final currentChapter = watchValue<ScriptureManager, int>((m) => m.chapter);
-
-    final chapters = manager.chapterCount;
+    final bookName = Metadata.bookName(book);
+    final chapters = Metadata.chapterCount(book);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Book ${manager.currentBookName}')),
+      appBar: AppBar(title: Text('Book $bookName')),
       body: GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const .all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
           crossAxisSpacing: 10,
@@ -77,12 +70,7 @@ class _ChapterListPage extends WatchingWidget {
         itemCount: chapters,
         itemBuilder: (context, index) {
           final chapter = index + 1;
-          final isSelected = chapter == currentChapter;
-          return _ChapterTile(
-            book: book,
-            chapter: chapter,
-            isSelected: isSelected,
-          );
+          return _ChapterTile(book: book, chapter: chapter);
         },
       ),
     );
@@ -90,15 +78,10 @@ class _ChapterListPage extends WatchingWidget {
 }
 
 class _ChapterTile extends StatelessWidget {
-  const _ChapterTile({
-    required this.book,
-    required this.chapter,
-    this.isSelected = false,
-  });
+  const _ChapterTile({required this.book, required this.chapter});
 
   final int book;
   final int chapter;
-  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +97,6 @@ class _ChapterTile extends StatelessWidget {
   }
 }
 
-/// Isolated per-chapter verse list — this is the widget that actually
-/// watches manager state; scoping it here means selecting a different
-/// chapter never rebuilds the book/chapter grid above it.
 class VerseListPage extends WatchingWidget {
   const VerseListPage({required this.book, required this.chapter, super.key});
 
@@ -125,14 +105,11 @@ class VerseListPage extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final manager = di<ScriptureManager>();
-
-    callOnce((context) {});
-
+    final bookName = Metadata.bookName(book);
     final verses = watchValue<ScriptureManager, List<Verse>>((m) => m.verses);
 
     return Scaffold(
-      appBar: AppBar(title: Text('${manager.currentBookName} $chapter')),
+      appBar: AppBar(title: Text('$bookName $chapter')),
       body: ListView.builder(
         itemCount: verses.length,
         itemBuilder: (context, index) => VerseTile(verse: verses[index]),

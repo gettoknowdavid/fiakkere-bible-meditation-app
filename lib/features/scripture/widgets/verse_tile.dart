@@ -9,15 +9,32 @@ class VerseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListTile(
-      title: Text(
-        verse.reference,
-        style: Theme.of(context).textTheme.labelLarge,
+      title: Align(
+        alignment: .centerLeft,
+        child: Container(
+          padding: .symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: .all(.circular(20)),
+            color: theme.colorScheme.primary,
+          ),
+          child: Text(
+            verse.reference,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onPrimary,
+            ),
+          ),
+        ),
       ),
-      subtitle: Text(verse.text, maxLines: 2, overflow: TextOverflow.ellipsis),
+      subtitle: Padding(
+        padding: const .all(8.0),
+        child: Text(verse.text, style: theme.textTheme.bodyLarge),
+      ),
       onTap: () => showModalBottomSheet(
         context: context,
         isScrollControlled: true,
+        useRootNavigator: true,
         builder: (_) => VerseDetailSheet(verseId: verse.id),
       ),
       // Long-press entry point for "Add to Playlist" — stubbed per T2.4,

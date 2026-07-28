@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:fiakkere/_shared/services/database_service.dart';
 import 'package:flutter/foundation.dart';
@@ -20,8 +19,8 @@ class ScriptureManager implements Disposable {
 
       final query = _verseBox
           .query(
-            Verse_.book.equals(book.value) &
-                Verse_.chapter.equals(chapter.value) &
+            Verse_.book.equals(args.book) &
+                Verse_.chapter.equals(args.chapter) &
                 Verse_.translation.equals(trans),
           )
           .order(Verse_.verse)
@@ -29,8 +28,8 @@ class ScriptureManager implements Disposable {
 
       try {
         final result = query.find();
-        log('Result of the verses query => $result');
         verses.startTransAction();
+        verses.clear();
         verses.addAll(result);
         verses.endTransAction();
       } finally {
@@ -38,12 +37,9 @@ class ScriptureManager implements Disposable {
       }
     });
     getVerseCommand = Command.createSync((verseId) {
-      verse.value = verseId;
-
       final query = _verseBox
           .query(
-            Verse_.book.equals(book.value) &
-                Verse_.chapter.equals(chapter.value) &
+            Verse_.id.equals(verseId) &
                 Verse_.translation.equals(translation.value),
           )
           .order(Verse_.verse)
@@ -64,6 +60,7 @@ class ScriptureManager implements Disposable {
       try {
         final result = query.find();
         crossReferences.startTransAction();
+        crossReferences.clear();
         crossReferences.addAll(result);
         crossReferences.endTransAction();
       } finally {
@@ -104,12 +101,6 @@ class ScriptureManager implements Disposable {
   List<String> get bookNames => Metadata.bookNames;
 
   String bookName(int id) => Metadata.bookName(id);
-
-  /// Get the current book name
-  String get currentBookName => Metadata.bookName(book.value);
-
-  /// Chapter count for the currently active book.
-  int get chapterCount => Metadata.chapterCount(book.value);
 
   /// Verse count for the currently active chapter.
   int get verseCount => Metadata.verseCount(book.value, chapter.value);
