@@ -1,4 +1,5 @@
 import 'package:fiakkere/_shared/services/database_service.dart';
+import 'package:fiakkere/features/scripture/manager/scripture_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
 
@@ -20,8 +21,9 @@ class FiakKereInitializationPage extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dbReady = isReady<DatabaseService>();
-    final progress = [dbReady].where((ready) => ready).length / 1;
+    final dbReady = isReady<Database>();
+    final vesresReady = isReady<ScriptureManager>();
+    final progress = [dbReady, vesresReady].where((ready) => ready).length / 2;
 
     if (dbReady) {
       callOnceAfterThisBuild((context) {
@@ -41,6 +43,7 @@ class FiakKereInitializationPage extends WatchingWidget {
             Center(child: CircularProgressIndicator(value: progress)),
             Text('Initializing... ${(progress * 100).toInt()}%'),
             if (dbReady) Text('✓ Database ready'),
+            if (vesresReady) Text('✓ Verses ready'),
           ],
         ),
       ),
@@ -53,6 +56,24 @@ class FiakKereHome extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Hello World!')));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          crossAxisAlignment: .center,
+          mainAxisAlignment: .center,
+          children: [
+            Text('Hello World!'),
+            ElevatedButton(
+              onPressed: () {
+                final args = ScriptureArgs(book: 1, chapter: 1);
+                final manager = di<ScriptureManager>();
+                manager.getVersesCommand.run(args);
+              },
+              child: Text('Test Verses'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

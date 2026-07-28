@@ -9,8 +9,8 @@ import 'package:models/models.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-class DatabaseService implements Disposable {
-  DatabaseService._(this._store);
+class Database implements Disposable {
+  Database._(this._store);
 
   late final Store _store;
   Store get store => _store;
@@ -19,7 +19,7 @@ class DatabaseService implements Disposable {
   static const _finalDirName = 'objectbox';
   static const _tempDirName = 'objectbox_temp_unzip';
 
-  static Future<DatabaseService> create() async {
+  static Future<Database> create() async {
     final supportDir = await getApplicationSupportDirectory();
     final finalStoreDir = Directory(path.join(supportDir.path, _finalDirName));
     final markerFIle = File(path.join(finalStoreDir.path, _markerFilename));
@@ -29,7 +29,7 @@ class DatabaseService implements Disposable {
     }
 
     final store = openStore(directory: finalStoreDir.path);
-    return DatabaseService._(store);
+    return Database._(store);
   }
 
   static Future<void> _unzipBundledStore(
