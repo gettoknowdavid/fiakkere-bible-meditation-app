@@ -318,7 +318,7 @@ in this project that's non-standard, and it should not be discovered as a blocke
 
 Feature-based, per PFA convention — organized by feature, not by technical layer.
 
-```
+```text
 lib/
   _shared/
     services/
@@ -430,7 +430,7 @@ Architecture layering**:
 
 **Target V2 layering:**
 
-```
+```text
 lib/
   data/           # ObjectBox, TTS, audio — Repository pattern over today's Services
   domain/         # Pure Dart entities + use-case classes, no Flutter imports

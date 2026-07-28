@@ -1,0 +1,266 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "4:3546499605548449245",
+      "lastPropertyId": "4:3997700867677226490",
+      "name": "CrossReference",
+      "properties": [
+        {
+          "id": "1:1775954466397370093",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1710348846469322605",
+          "name": "sourceVerseId",
+          "indexId": "4:7807475108485719313",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Verse"
+        },
+        {
+          "id": "3:6553568043877273804",
+          "name": "relatedVerseId",
+          "indexId": "5:5757325043275853582",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Verse"
+        },
+        {
+          "id": "4:3997700867677226490",
+          "name": "weight",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:8379795609271225814",
+      "lastPropertyId": "4:2504596250486258632",
+      "name": "PlaylistItem",
+      "properties": [
+        {
+          "id": "1:474806609586836313",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1749196803060034374",
+          "name": "playlistId",
+          "indexId": "8:1707994132779685612",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "MeditationPlaylist"
+        },
+        {
+          "id": "3:2974613144490265516",
+          "name": "verseId",
+          "indexId": "9:6399301089202165551",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Verse"
+        },
+        {
+          "id": "4:2504596250486258632",
+          "name": "sortOrder",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:2214344021986212333",
+      "lastPropertyId": "3:6980963724074942879",
+      "name": "MeditationPlaylist",
+      "properties": [
+        {
+          "id": "1:7464846729035417568",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8922881965815583852",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:6980963724074942879",
+          "name": "createdAt",
+          "type": 10
+        }
+      ],
+      "relations": [
+        {
+          "id": "2:790814190769568083",
+          "name": "items",
+          "targetId": "6:8379795609271225814"
+        }
+      ]
+    },
+    {
+      "id": "8:3890027473025477599",
+      "lastPropertyId": "11:3782261739662360129",
+      "name": "Metadata",
+      "properties": [
+        {
+          "id": "1:1011731178386730065",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1963016350382378077",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:1582098096356129446",
+          "name": "shortname",
+          "indexId": "10:5725041447701703667",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:6115636324748559350",
+          "name": "module",
+          "type": 9
+        },
+        {
+          "id": "5:6219379861141269716",
+          "name": "year",
+          "type": 9
+        },
+        {
+          "id": "6:6756359992663534256",
+          "name": "publisher",
+          "type": 9
+        },
+        {
+          "id": "7:4293048652992687769",
+          "name": "owner",
+          "type": 9
+        },
+        {
+          "id": "8:158432357048145000",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "9:7120149939657702095",
+          "name": "lang",
+          "type": 9
+        },
+        {
+          "id": "10:7900534065784778365",
+          "name": "langShort",
+          "type": 9
+        },
+        {
+          "id": "11:3782261739662360129",
+          "name": "copyrightStatement",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:8489944971351774024",
+      "lastPropertyId": "8:3464414837333731609",
+      "name": "Verse",
+      "properties": [
+        {
+          "id": "1:2964034781998262364",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8821158339924011953",
+          "name": "reference",
+          "indexId": "12:6785230692318440910",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:6270851429001924652",
+          "name": "book",
+          "indexId": "13:5330081434616714312",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "4:1904923254652677788",
+          "name": "chapter",
+          "type": 6
+        },
+        {
+          "id": "5:4289107915045265973",
+          "name": "verse",
+          "type": 6
+        },
+        {
+          "id": "6:3928922443664453215",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "7:7212030081692829614",
+          "name": "translation",
+          "type": 9
+        },
+        {
+          "id": "8:3464414837333731609",
+          "name": "metadataId",
+          "indexId": "14:8023906606349551837",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Metadata"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "9:8489944971351774024",
+  "lastIndexId": "14:8023906606349551837",
+  "lastRelationId": "2:790814190769568083",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    7791345875852312257,
+    1021189109591873552,
+    91889918951979563,
+    3160260449548396220
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    7129128353696499471,
+    8889419185661275642,
+    7511637962366237687,
+    6466569955670898907,
+    4106185461765933107,
+    4327969715326238161,
+    3789691750206635354,
+    8767523679426092246,
+    4886180285984584922,
+    8373675238446117924,
+    2581059691119494902,
+    7628743983727105264,
+    2430605219461517686,
+    7826691864367915196,
+    2864625648471129206,
+    2095267925952215025,
+    6841577646520005701,
+    6299177473788460423
+  ],
+  "retiredRelationUids": [
+    2872771344200630570
+  ],
+  "version": 1
+}
