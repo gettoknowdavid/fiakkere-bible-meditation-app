@@ -123,8 +123,19 @@ class ScriptureManager implements Disposable {
   @override
   FutureOr<dynamic> onDispose() {
     _searchQuerySubscription.cancel();
+
     searchQueryCommand.dispose();
     searchCommand.dispose();
+    getVersesCommand.dispose();
+    getVerseCommand.dispose();
+    getCrossReferenceCommand.dispose();
+
+    book.dispose();
+    chapter.dispose();
+    verse.dispose();
+    translation.dispose();
+    verses.dispose();
+    crossReferences.dispose();
   }
 }
 
