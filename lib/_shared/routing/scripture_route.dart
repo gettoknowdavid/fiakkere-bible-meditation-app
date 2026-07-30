@@ -16,6 +16,9 @@ final class ChapterList extends ScriptureRoute {
   const ChapterList({required this.book});
 
   final int book;
+
+  @override
+  List<Object?> get props => [book];
 }
 
 final class VerseList extends ScriptureRoute {
@@ -23,4 +26,7 @@ final class VerseList extends ScriptureRoute {
 
   final int book;
   final int chapter;
+
+  @override
+  List<Object?> get props => [book, chapter];
 }
