@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fiakkere/features/playlist/widgets/add_to_playlist_button.dart';
 import 'package:fiakkere/features/scripture/manager/scripture_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
@@ -51,14 +52,7 @@ class VerseDetailSheet extends WatchingWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 12),
-            FilledButton.tonalIcon(
-              onPressed: () {
-                // TODO(T3.3): PlaylistManager.addVerseCommand(playlistId, verseId)
-                // Stubbed here per T2.4 — wired once PlaylistManager exists.
-              },
-              icon: const Icon(Icons.playlist_add),
-              label: const Text('Add to Playlist'),
-            ),
+            AddToPlaylistButton(verseId: verse.data!.id),
             const SizedBox(height: 24),
             if (crossRefs.isNotEmpty) ...[
               Text(

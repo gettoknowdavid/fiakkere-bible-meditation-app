@@ -1,6 +1,7 @@
 import 'package:fiakkere/_shared/routing/playlist_route.dart';
 import 'package:fiakkere/_shared/routing/scripture_route.dart';
 import 'package:fiakkere/_shared/routing/settings_route.dart';
+import 'package:fiakkere/features/playlist/pages/playlist_detail_page.dart';
 import 'package:fiakkere/features/playlist/pages/playlist_list_page.dart';
 import 'package:fiakkere/features/scripture/pages/verse_browser_page.dart';
 import 'package:fiakkere/features/scripture/pages/verse_search_page.dart';
@@ -30,7 +31,9 @@ class AppShell extends StatelessWidget {
           initial: const PlaylistList(),
           builder: (context, route) => switch (route) {
             PlaylistList() => const PlaylistListPage(),
-            PlaylistDetail() => const Placeholder(),
+            PlaylistDetail(:final playlistId) => PlaylistDetailPage(
+              id: playlistId,
+            ),
           },
         ),
         KaiselBranchSpec<SettingsRoute>(

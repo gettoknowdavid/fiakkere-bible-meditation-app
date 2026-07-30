@@ -37,11 +37,23 @@ class VerseTile extends StatelessWidget {
         useRootNavigator: true,
         builder: (_) => VerseDetailSheet(verseId: verse.id),
       ),
-      // Long-press entry point for "Add to Playlist" — stubbed per T2.4,
-      // wired for real in T3.3 once PlaylistManager exists.
       onLongPress: () {
-        // TODO(T3.3): open AddToPlaylistButton picker via PlaylistManager.
+        showModalBottomSheet(
+          context: context,
+          builder: (_) => _PlaylistPickerSheet(verseId: verse.id),
+        );
       },
     );
+  }
+}
+
+class _PlaylistPickerSheet extends StatelessWidget {
+  const _PlaylistPickerSheet({required this.verseId});
+
+  final int verseId;
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

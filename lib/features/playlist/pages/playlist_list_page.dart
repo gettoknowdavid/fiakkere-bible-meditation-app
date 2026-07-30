@@ -11,20 +11,19 @@ class PlaylistListPage extends WatchingWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Meditation Playlists')),
-      body: _PlaylistList(),
+      appBar: AppBar(title: const Text('Meditation Playlists')),
+      body: const _PlaylistList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateDialog(context),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  Future<void> _showCreateDialog(BuildContext context) {
-    return showAdaptiveDialog(
-      context: context,
-      builder: (context) => SimpleDialog(),
-    );
+  Future<void> _showCreateDialog(BuildContext context) async {
+    final name = await _showNameDialog(context, title: 'New Playlist');
+    if (name == null || name.trim().isEmpty) return;
+    di<PlaylistManager>().createPlaylistCommand.run(name.trim());
   }
 }
 
@@ -38,7 +37,7 @@ class _PlaylistList extends WatchingWidget {
     );
 
     if (playlists.isEmpty) {
-      return Center(
+      return const Center(
         child: Text('No playlists yet — create one to get started'),
       );
     }
@@ -46,7 +45,7 @@ class _PlaylistList extends WatchingWidget {
     return ListView.separated(
       itemCount: playlists.length,
       itemBuilder: (ctx, i) => _PlaylistRow(playlist: playlists[i]),
-      separatorBuilder: (context, index) => SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
     );
   }
 }
@@ -62,17 +61,20 @@ class _PlaylistRow extends StatelessWidget {
       title: Text(playlist.name),
       subtitle: Text('${playlist.items.length} verses'),
       onTap: () => context.push(PlaylistDetail(playlist.id)),
-      trailing: PopupMenuButton(
+      trailing: PopupMenuButton<String>(
         itemBuilder: (context) {
-          return [
-            const PopupMenuItem<String>(value: 'Rename', child: Text('Rename')),
-            const PopupMenuItem<String>(value: 'Delete', child: Text('Delete')),
+          return const [
+            PopupMenuItem<String>(value: 'Rename', child: Text('Rename')),
+            PopupMenuItem<String>(value: 'Delete', child: Text('Delete')),
           ];
         },
-        onSelected: (action) => switch (action) {
-          'Rename' => _showRenameDialog(context, playlist),
-          'Delete' => _confirmAndDeleteDialog(context, playlist.id),
-          _ => () {},
+        onSelected: (action) {
+          switch (action) {
+            case 'Rename':
+              _showRenameDialog(context, playlist);
+            case 'Delete':
+              _confirmAndDeleteDialog(context, playlist.id);
+          }
         },
       ),
     );
@@ -81,17 +83,84 @@ class _PlaylistRow extends StatelessWidget {
   Future<void> _showRenameDialog(
     BuildContext context,
     MeditationPlaylist playlist,
-  ) {
-    return showAdaptiveDialog(
-      context: context,
-      builder: (context) => SimpleDialog(),
+  ) async {
+    final name = await _showNameDialog(
+      context,
+      title: 'Rename Playlist',
+      initialValue: playlist.name,
+    );
+    if (name == null || name.trim().isEmpty) return;
+    di<PlaylistManager>().renamePlaylistCommand.run(
+      RenamePlaylistArgs(playlistId: playlist.id, newName: name.trim()),
     );
   }
 
-  Future<void> _confirmAndDeleteDialog(BuildContext context, int playlistId) {
-    return showAdaptiveDialog(
+  Future<void> _confirmAndDeleteDialog(
+    BuildContext context,
+    int playlistId,
+  ) async {
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => SimpleDialog(),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Playlist?'),
+          content: const Text(
+            'This will remove the playlist and its verse order. This cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(dialogContext).colorScheme.error,
+                foregroundColor: Theme.of(dialogContext).colorScheme.onError,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
+
+    if (confirmed ?? false) {
+      di<PlaylistManager>().deletePlaylistCommand.run(playlistId);
+    }
   }
+}
+
+/// Shared name-entry dialog used for both create and rename flows.
+Future<String?> _showNameDialog(
+  BuildContext context, {
+  required String title,
+  String? initialValue,
+}) {
+  final controller = TextEditingController(text: initialValue);
+  return showDialog<String>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(hintText: 'Playlist name'),
+          onSubmitted: (value) => Navigator.of(dialogContext).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+            child: Text(initialValue == null ? 'Create' : 'Save'),
+          ),
+        ],
+      );
+    },
+  );
 }
