@@ -60,7 +60,7 @@ class SessionManager implements Disposable {
   }
 
   void _pause() {
-    sessionState.value = .pause;
+    sessionState.value = .paused;
     _pauseTimer();
   }
 

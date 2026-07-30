@@ -1,1 +1,1 @@
-enum SessionState { idle, playing, pause, completed }
+enum SessionState { idle, playing, paused, completed }

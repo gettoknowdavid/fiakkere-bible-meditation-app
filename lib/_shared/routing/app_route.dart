@@ -21,10 +21,5 @@ final class LoginRoute extends AppRoute {
 }
 
 final class SessionPlayer extends AppRoute {
-  const SessionPlayer(this.playlistId);
-
-  final int playlistId;
-
-  @override
-  List<Object?> get props => [playlistId];
+  const SessionPlayer();
 }

@@ -1,5 +1,6 @@
 import 'package:fiakkere/_shared/routing/app_route.dart';
 import 'package:fiakkere/app_shell.dart';
+import 'package:fiakkere/features/session/pages/session_player_page.dart';
 import 'package:fiakkere/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:kaisel/kaisel.dart';
@@ -11,7 +12,7 @@ final _routerConfig = KaiselRouterConfig<AppRoute>(
     OnboardingRoute() => const Placeholder(),
     LoginRoute() => const Placeholder(),
     ShellHost() => const AppShell(),
-    SessionPlayer() => Placeholder(),
+    SessionPlayer() => const SessionPlayerPage(),
   },
 );
 

@@ -1,7 +1,10 @@
+import 'package:fiakkere/_shared/routing/app_route.dart';
 import 'package:fiakkere/features/playlist/manager/playlist_manager.dart';
 import 'package:fiakkere/features/playlist/widgets/playlist_item_tile.dart';
+import 'package:fiakkere/features/session/manager/session_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
+import 'package:kaisel/kaisel.dart';
 import 'package:models/models.dart';
 
 class PlaylistDetailPage extends WatchingWidget {
@@ -11,13 +14,20 @@ class PlaylistDetailPage extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final manager = di<PlaylistManager>();
-    callOnce((context) => manager.loadPlaylistItemsCommand.run(id));
+    final playlistManager = di<PlaylistManager>();
+    final sessionManager = di<SessionManager>();
+
+    callOnce((context) => playlistManager.loadPlaylistItemsCommand.run(id));
+
     return Scaffold(
       appBar: AppBar(title: _PlaylistTitle(playlistId: id)),
       body: _ReorderableItemList(playlistId: id),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          final items = playlistManager.activeItems.value;
+          sessionManager.startCommand.run(items);
+          context.push(const SessionPlayer());
+        },
         child: const Icon(Icons.play_arrow),
       ),
     );
