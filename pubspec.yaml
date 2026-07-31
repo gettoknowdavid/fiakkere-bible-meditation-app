@@ -8,9 +8,13 @@ environment:
 
 dependencies:
   archive: ^4.0.9
+  audio_service: ^0.18.19
+  crypto: ^3.0.7
   flutter:
     sdk: flutter
   flutter_it: ^2.1.2
+  flutter_tts: ^4.2.5
+  just_audio: ^0.10.6
   kaisel: ^1.0.0
   models:
     path: ./packages/models
